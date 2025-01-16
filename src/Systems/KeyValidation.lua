@@ -90,9 +90,9 @@ Module.CopyLink = function()
 
 	if Success then
 		SetClipboard(Link)
-		Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, nil})
+		Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, "rewind"})
 	else
-		Rayfield:Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
+		Rayfield:Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5, "rewind")
 	end
 end
 

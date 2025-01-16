@@ -42,7 +42,7 @@ Module.GenerateNonce = function()
 	local String = ""
 
 	for _ = 1, 16 do
-		String = String .. FunctionsLib.StringChar(math.floor(math.random() * (122 - 97 + 1)) + 97)
+		String = String .. string.char(math.floor(math.random() * (122 - 97 + 1)) + 97)
 	end
 
 	return String

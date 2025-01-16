@@ -77,7 +77,7 @@ Module.CacheLink = function()
 		elseif Response.StatusCode == 429 then
 			local Message = "you are being rate limited, please wait 20 seconds and try again."
 
-			Notify.Notify("Slow Down!", Message)
+			Notify("Slow Down!", Message)
 			return false, Message
 		end
 	else
@@ -90,9 +90,9 @@ Module.CopyLink = function()
 
 	if Success then
 		SetClipboard(Link)
-		Notify.Notify("Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5)
+		Notify("Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5)
 	else
-		Notify.Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
+		Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
 	end
 end
 
@@ -134,30 +134,30 @@ Module.RedeemKey = function(Key)
 					return true
 				end
 			else
-				Notify.Notify("Invalid Key", "Your key is invalid.")
+				Notify("Invalid Key", "Your key is invalid.")
 				return false
 			end
 		else
 			if string.sub(Decoded.message, 1, 27) == "unique constraint violation" then
-				Notify.Notify("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
+				Notify("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
 				return false
 			else
-				Notify.Notify("???", Decoded.message)
+				Notify("???", Decoded.message)
 				return false
 			end
 		end
 	elseif Response.StatusCode == 429 then
-		Notify.Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+		Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
 		return false
 	else
-		Notify.Notify("Error", "server returned an invalid status code, please try again later.")
+		Notify("Error", "server returned an invalid status code, please try again later.")
 		return false
 	end
 end
 
 Module.VerifyKey = function(Key)
 	if RequestSending == true then
-		Notify.Notify("Slow Down!", "a request is already being sent, please slow down.")
+		Notify("Slow Down!", "a request is already being sent, please slow down.")
 		return false
 	else
 		RequestSending = true
@@ -188,19 +188,19 @@ Module.VerifyKey = function(Key)
 				if string.sub(Key, 1, 4) == "KEY_" then
 					return RedeemKey(Key)
 				else
-					Notify.Notify("Invalid Key", "Your key is invalid")
+					Notify("Invalid Key", "Your key is invalid")
 					return false
 				end
 			end
 		else
-			Notify.Notify("???", Decoded.message)
+			Notify("???", Decoded.message)
 			return false
 		end
 	elseif response.StatusCode == 429 then
-		Notify.Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+		Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
 		return false
 	else
-		Notify.Notify("Error", "server returned an invalid status code, please try again later.")
+		Notify("Error", "server returned an invalid status code, please try again later.")
 		return false
 	end
 end

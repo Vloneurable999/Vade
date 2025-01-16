@@ -6,6 +6,7 @@ local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneu
 local CachedLink = ""
 local CachedTime = 0
 local Service = 1202
+local SetClipboard = setclipboard or toclipboard
 
 --// Functions \\--
 
@@ -50,7 +51,7 @@ Module.CopyLink = function()
 	local Success, Link = Module.CacheLink()
 
 	if Success then
-		FunctionsLib.SetClipboard(Link)
+		SetClipboard(Link)
 		Notify("Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5)
 	else
 		Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)

@@ -1,12 +1,10 @@
-local Module = {}
-
 --// Variables \\--
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 --// Main \\--
 
-function Module.Notify(TitleText, ContentText, Duration, Image)
+return function(TitleText, ContentText, Duration, Image)
 	Rayfield:Notify({
 		Title = TitleText or "",
 		Content = ContentText or "",
@@ -14,5 +12,3 @@ function Module.Notify(TitleText, ContentText, Duration, Image)
 		Image = Image or "rewind"
 	})
 end
-
-return Module

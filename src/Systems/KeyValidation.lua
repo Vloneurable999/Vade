@@ -2,60 +2,51 @@ local Module = {}
 
 --// Variables \\--
 
-local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/Notify.lua"))()
-local CachedLink = ""
-local CachedTime = 0
-local Service = 1202
-local SetClipboard = setclipboard or toclipboard
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local KeyValidation = nil
 
---// Functions \\--
+--// Main \\--
 
-Module.CacheLink = function()
-	if CachedTime + (10 * 60) < os.time() then
-		local Response = FunctionsLib.GetRequest({
-			Url = Host .. "/public/start",
-			Method = "POST",
+function Module:Init()
+	local Window = Rayfield:CreateWindow({
+		Name = "Vade Key",
+		LoadingTitle = "Vade",
+		LoadingSubtitle = "by skyler_wrld",
+		Theme = "Default",
+		DisableRayfieldPrompts = false,
+		DisableBuildWarnings = false, 
+		KeySystem = false,
 
-			Body = Encode({
-				service = Service,
-				identifier = Digest(FunctionsLib.GetHWID())
-			}),
+		ConfigurationSaving = {
+			Enabled = false,
+			FolderName = nil,
+			FileName = nil
+		},
 
-			Headers = {
-				["Content-Type"] = "application/json"
-			}
-		})
+		Discord = {
+			Enabled = true,
+			Invite = "https://discord.gg/Dm2B5QNgyX",
+			RememberJoins = true 
+		}
+	})
 
-		if Response.StatusCode == 200 then
-			local Decoded = Decode(Response.Body)
+	local KeyTab = Window:CreateTab("Key")
+	
+	KeyTab:CreateInput({
+		Name = "Key Input",
+		CurrentValue = "",
+		PlaceholderText = "Enter Your Key",
+		RemoveTextAfterFocusLost = false,
+		Flag = "VadeKey",
+		
+		Callback = function(Text)
+			--Add Logic
+		end,
+	})
 
-			if Decoded.success == true then
-				CachedLink = Decoded.data.url
-				CachedTime = os.time()
-				return true, CachedLink
-			else
-				return false, Decoded.message
-			end
-		elseif Response.StatusCode == 429 then
-			local Message = "you are being rate limited, please wait 20 seconds and try again."
-
-			Notify("Slow Down!", Message)
-			return false, Message
-		end
-	else
-		return true, CachedLink
-	end
-end
-
-Module.CopyLink = function()
-	local Success, Link = Module.CacheLink()
-
-	if Success then
-		SetClipboard(Link)
-		Notify("Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5)
-	else
-		Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
-	end
+	KeyTab:CreateButton({
+		Name = "Get Key",
+	})
 end
 
 return Module

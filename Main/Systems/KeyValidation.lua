@@ -7,7 +7,9 @@ local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneu
 local CachedLink = ""
 local CachedTime = 0
 local Service = 1202
+local UseNonce = true
 local Host = "https://api.platoboost.com"
+local SecretCode = "b3eded5e-ccb2-4451-851b-7fb0ca80cdfb"
 local RequestSending = false
 local SetClipboard = setclipboard or toclipboard
 local GetRequest = request or http_request
@@ -24,7 +26,7 @@ Module.Decode = function(Data)
 end
 
 Module.Digest = function(Input)
-	local InputString = tostring(input)
+	local InputString = tostring(Input)
 	local Hash = {}
 	local HashHex = ""
 
@@ -90,9 +92,9 @@ Module.CopyLink = function()
 
 	if Success then
 		SetClipboard(Link)
-		Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, "rewind"})
+		Notify.Alert({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, "rewind"})
 	else
-		Rayfield:Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5, "rewind")
+		Notify.Alert("Error", "Error getting the key link. Report this in the discord server.", 6.5, "rewind")
 	end
 end
 
@@ -105,7 +107,7 @@ Module.RedeemKey = function(Key)
 		key = Key
 	}
 
-	if useNonce then
+	if UseNonce then
 		body.nonce = nonce
 	end
 
@@ -123,26 +125,26 @@ Module.RedeemKey = function(Key)
 
 		if Decoded.success == true then
 			if Decoded.data.valid == true then
-				if useNonce then
-					if Decoded.data.hash == Module.Digest("true" .. "-" .. nonce .. "-" .. Secret) then
+				if UseNonce then
+					if Decoded.data.hash == Module.Digest("true" .. "-" .. nonce .. "-" .. SecretCode) then
 						return true
 					else
-						--Notify.Alert("Failed", "Failed to verify integrity.")
+						Notify.Alert("Failed", "Failed to verify integrity.")
 						return false
 					end    
 				else
 					return true
 				end
 			else
-				--Notify.Alert("Invalid Key", "Your key is invalid.")
+				Notify.Alert("Invalid Key", "Your key is invalid.")
 				return false
 			end
 		else
 			if string.sub(Decoded.message, 1, 27) == "unique constraint violation" then
-				--Notify.Alert("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
+				Notify.Alert("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
 				return false
 			else
-				--Notify.Alert("???", Decoded.message)
+				Notify.Alert("???", Decoded.message)
 				return false
 			end
 		end
@@ -157,7 +159,7 @@ end
 
 Module.VerifyKey = function(Key)
 	if RequestSending == true then
-		--Notify.Alert("Slow Down!", "a request is already being sent, please slow down.")
+		Notify.Alert("Slow Down!", "a request is already being sent, please slow down.")
 		return false
 	else
 		RequestSending = true
@@ -186,21 +188,21 @@ Module.VerifyKey = function(Key)
 				end
 			else
 				if string.sub(Key, 1, 4) == "KEY_" then
-					return RedeemKey(Key)
+					return Module.RedeemKey(Key)
 				else
-					--Notify.Alert("Invalid Key", "Your key is invalid")
+					Notify.Alert("Invalid Key", "Your key is invalid")
 					return false
 				end
 			end
 		else
-			--Notify.Alert("???", Decoded.message)
+			Notify.Alert("???", Decoded.message)
 			return false
 		end
-	elseif response.StatusCode == 429 then
-		--Notify.Alert("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+	elseif Response.StatusCode == 429 then
+		Notify.Alert("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
 		return false
 	else
-		--Notify.Alert("Error", "server returned an invalid status code, please try again later.")
+		Notify.Alert("Error", "server returned an invalid status code, please try again later.")
 		return false
 	end
 end

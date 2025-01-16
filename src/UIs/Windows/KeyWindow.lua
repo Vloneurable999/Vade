@@ -3,7 +3,8 @@ local Module = {}
 --// Variables \\--
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local KeyValidation = loadstring(game:HttpGet('https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/KeyValidation.lua'))()
+local KeyValidation = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/KeyValidation.lua"))()
+local MainWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/UIs/Windows/MainWindow.lua"))()
 
 --// Main \\--
 
@@ -43,7 +44,8 @@ function Module.Init()
 			local Verify = KeyValidation.VerifyKey(Text)
 			
 			if Verify then
-				
+				Rayfield:Destroy()
+				MainWindow.Init()
 			end 
 		end,
 	})

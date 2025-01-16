@@ -3,10 +3,11 @@ local Module = {}
 --// Variables \\--
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local KeyValidation = nil
 
 --// Main \\--
 
-function Module:Init()
+function Module.Init()
 	local Window = Rayfield:CreateWindow({
 		Name = "Vade Key",
 		LoadingTitle = "Vade",

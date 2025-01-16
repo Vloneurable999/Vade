@@ -54,6 +54,7 @@ function Module.Init()
 		Name = "Get Key",
 		
 		Callback = function()
+			Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, "rewind"})
 			KeyValidation.CopyLink()
 		end,
 	})

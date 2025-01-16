@@ -92,7 +92,7 @@ Module.CopyLink = function()
 		SetClipboard(Link)
 		Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, nil})
 	else
-		Notify.Alert("Error", "Error getting the key link. Report this in the discord server.", 6.5)
+		Rayfield:Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
 	end
 end
 
@@ -127,22 +127,22 @@ Module.RedeemKey = function(Key)
 					if Decoded.data.hash == Module.Digest("true" .. "-" .. nonce .. "-" .. Secret) then
 						return true
 					else
-						Notify.Alert("Failed", "Failed to verify integrity.")
+						--Notify.Alert("Failed", "Failed to verify integrity.")
 						return false
 					end    
 				else
 					return true
 				end
 			else
-				Notify.Alert("Invalid Key", "Your key is invalid.")
+				--Notify.Alert("Invalid Key", "Your key is invalid.")
 				return false
 			end
 		else
 			if string.sub(Decoded.message, 1, 27) == "unique constraint violation" then
-				Notify.Alert("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
+				--Notify.Alert("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
 				return false
 			else
-				Notify.Alert("???", Decoded.message)
+				--Notify.Alert("???", Decoded.message)
 				return false
 			end
 		end
@@ -157,7 +157,7 @@ end
 
 Module.VerifyKey = function(Key)
 	if RequestSending == true then
-		Notify.Alert("Slow Down!", "a request is already being sent, please slow down.")
+		--Notify.Alert("Slow Down!", "a request is already being sent, please slow down.")
 		return false
 	else
 		RequestSending = true
@@ -188,19 +188,19 @@ Module.VerifyKey = function(Key)
 				if string.sub(Key, 1, 4) == "KEY_" then
 					return RedeemKey(Key)
 				else
-					Notify.Alert("Invalid Key", "Your key is invalid")
+					--Notify.Alert("Invalid Key", "Your key is invalid")
 					return false
 				end
 			end
 		else
-			Notify.Alert("???", Decoded.message)
+			--Notify.Alert("???", Decoded.message)
 			return false
 		end
 	elseif response.StatusCode == 429 then
-		Notify.Alert("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+		--Notify.Alert("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
 		return false
 	else
-		Notify.Alert("Error", "server returned an invalid status code, please try again later.")
+		--Notify.Alert("Error", "server returned an invalid status code, please try again later.")
 		return false
 	end
 end

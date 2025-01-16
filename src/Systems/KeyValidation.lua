@@ -6,6 +6,7 @@ local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneu
 local CachedLink = ""
 local CachedTime = 0
 local Service = 1202
+local Host = "https://api.platoboost.com"
 local RequestSending = false
 local SetClipboard = setclipboard or toclipboard
 local GetRequest = request or http_request
@@ -13,15 +14,15 @@ local GetHWID = gethwid or function() return game:GetService("Players").LocalPla
 
 --// Functions \\--
 
-Encode = function(Data)
+Module.Encode = function(Data)
 	return game:GetService("HttpService"):JSONEncode(Data)
 end
 
-Decode = function(Data)
+Module.Decode = function(Data)
 	return game:GetService("HttpService"):JSONDecode(Data)
 end
 
-Digest = function(Input)
+Module.Digest = function(Input)
 	local InputString = tostring(input)
 	local Hash = {}
 	local HashHex = ""
@@ -37,15 +38,25 @@ Digest = function(Input)
 	return HashHex
 end
 
+Module.GenerateNonce = function()
+	local String = ""
+
+	for _ = 1, 16 do
+		String = String .. FunctionsLib.StringChar(math.floor(math.random() * (122 - 97 + 1)) + 97)
+	end
+
+	return String
+end
+
 Module.CacheLink = function()
 	if CachedTime + (10 * 60) < os.time() then
 		local Response = GetRequest({
 			Url = Host .. "/public/start",
 			Method = "POST",
 
-			Body = Encode({
+			Body = Module.Encode({
 				service = Service,
-				identifier = Digest(GetHWID())
+				identifier = Module.Digest(GetHWID())
 			}),
 
 			Headers = {
@@ -54,7 +65,7 @@ Module.CacheLink = function()
 		})
 
 		if Response.StatusCode == 200 then
-			local Decoded = Decode(Response.Body)
+			local Decoded = Module.Decode(Response.Body)
 
 			if Decoded.success == true then
 				CachedLink = Decoded.data.url
@@ -86,11 +97,11 @@ Module.CopyLink = function()
 end
 
 Module.RedeemKey = function(Key)
-	local nonce = GenerateNonce()
+	local nonce = Module.GenerateNonce()
 	local Endpoint = Host .. "/public/redeem/" .. tostring(Service)
 
 	local body = {
-		identifier = Digest(GetHWID()),
+		identifier = Module.Digest(GetHWID()),
 		key = Key
 	}
 
@@ -101,19 +112,19 @@ Module.RedeemKey = function(Key)
 	local Response = GetRequest({
 		Url = Endpoint,
 		Method = "POST",
-		Body = Encode(body),
+		Body = Module.Encode(body),
 		Headers = {
 			["Content-Type"] = "application/json"
 		}
 	})
 
 	if Response.StatusCode == 200 then
-		local Decoded = Decode(Response.Body)
+		local Decoded = Module.Decode(Response.Body)
 
 		if Decoded.success == true then
 			if Decoded.data.valid == true then
 				if useNonce then
-					if Decoded.data.hash == Digest("true" .. "-" .. nonce .. "-" .. Secret) then
+					if Decoded.data.hash == Module.Digest("true" .. "-" .. nonce .. "-" .. Secret) then
 						return true
 					else
 						Notify("Failed", "Failed to verify integrity.")
@@ -127,7 +138,7 @@ Module.RedeemKey = function(Key)
 				return false
 			end
 		else
-			if FunctionsLib.StringSub(Decoded.message, 1, 27) == "unique constraint violation" then
+			if string.sub(Decoded.message, 1, 27) == "unique constraint violation" then
 				Notify("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
 				return false
 			else
@@ -152,19 +163,19 @@ Module.VerifyKey = function(Key)
 		RequestSending = true
 	end
 
-	local nonce = GenerateNonce()
-	local Endpoint = Host .. "/public/whitelist/" .. tostring(Service) .. "?identifier=" .. Digest(FunctionsLib.GetHWID()) .. "&key=" .. Key
+	local nonce = Module.GenerateNonce()
+	local Endpoint = Host .. "/public/whitelist/" .. tostring(Service) .. "?identifier=" .. Module.Digest(GetHWID()) .. "&key=" .. Key
 
 	if UseNonce then
 		Endpoint = Endpoint .. "&nonce=" .. nonce
 	end
 
-	local Response = FunctionsLib.GetRequest({Url = Endpoint, Method = "GET"})
+	local Response = GetRequest({Url = Endpoint, Method = "GET"})
 
 	RequestSending = false
 
 	if Response.StatusCode == 200 then
-		local Decoded = Decode(Response.Body)
+		local Decoded = Module.Decode(Response.Body)
 
 		if Decoded.success == true then
 			if Decoded.data.valid == true then
@@ -174,7 +185,7 @@ Module.VerifyKey = function(Key)
 					return true
 				end
 			else
-				if FunctionsLib.StringSub(Key, 1, 4) == "KEY_" then
+				if string.sub(Key, 1, 4) == "KEY_" then
 					return RedeemKey(Key)
 				else
 					Notify("Invalid Key", "Your key is invalid")

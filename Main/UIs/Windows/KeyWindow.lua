@@ -3,8 +3,8 @@ local Module = {}
 --// Variables \\--
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local KeyValidation = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/KeyValidation.lua"))()
-local MainWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/UIs/Windows/MainWindow.lua"))()
+local KeyValidation = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/Main/Systems/KeyValidation.lua"))()
+local MainWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/Main/UIs/Windows/MainWindow.lua"))()
 
 --// Main \\--
 
@@ -54,7 +54,6 @@ function Module.Init()
 		Name = "Get Key",
 		
 		Callback = function()
-			Rayfield:Notify({"Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5, "rewind"})
 			KeyValidation.CopyLink()
 		end,
 	})

@@ -3,13 +3,12 @@ local Module = {}
 --// Variables \\--
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local KeyValidation = loadstring(game:HttpGet('https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/KeyValidation.lua'))()
 
 --// Main \\--
 
 function Module.Init()
 	local Window = Rayfield:CreateWindow({
-		Name = "Vade Key",
+		Name = "Vade Main",
 		LoadingTitle = "Vade",
 		LoadingSubtitle = "by skyler_wrld",
 		Theme = "Default",
@@ -30,29 +29,22 @@ function Module.Init()
 		}
 	})
 
-	local KeyTab = Window:CreateTab("Key")
-	
-	KeyTab:CreateInput({
-		Name = "Key Input",
-		CurrentValue = "",
-		PlaceholderText = "Enter Your Key",
-		RemoveTextAfterFocusLost = false,
-		Flag = "VadeKey",
-		
-		Callback = function(Text)
-			local Verify = KeyValidation.VerifyKey(Text)
-			
-			if Verify then
-				
-			end 
-		end,
-	})
+	local MainTab = Window:CreateTab("Main")
 
-	KeyTab:CreateButton({
-		Name = "Get Key",
+	MainTab:CreateButton({
+		Name = "Test",
+	})
+	
+	local Slider = MainTab:CreateSlider({
+		Name = "Example",
+		Range = {0, 100},
+		Increment = 10,
+		Suffix = "IDK",
+		CurrentValue = 10,
+		Flag = "Slider1",
 		
-		Callback = function()
-			KeyValidation.CopyLink()
+		Callback = function(Value)
+			
 		end,
 	})
 end

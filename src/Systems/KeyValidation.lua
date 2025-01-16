@@ -2,51 +2,196 @@ local Module = {}
 
 --// Variables \\--
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local KeyValidation = nil
+local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/src/Systems/Notify.lua"))()
+local CachedLink = ""
+local CachedTime = 0
+local Service = 1202
+local RequestSending = false
+local SetClipboard = setclipboard or toclipboard
+local GetRequest = request or http_request
+local GetHWID = gethwid or function() return game:GetService("Players").LocalPlayer.UserId end
 
---// Main \\--
+--// Functions \\--
 
-function Module:Init()
-	local Window = Rayfield:CreateWindow({
-		Name = "Vade Key",
-		LoadingTitle = "Vade",
-		LoadingSubtitle = "by skyler_wrld",
-		Theme = "Default",
-		DisableRayfieldPrompts = false,
-		DisableBuildWarnings = false, 
-		KeySystem = false,
+Encode = function(Data)
+	return game:GetService("HttpService"):JSONEncode(Data)
+end
 
-		ConfigurationSaving = {
-			Enabled = false,
-			FolderName = nil,
-			FileName = nil
-		},
+Decode = function(Data)
+	return game:GetService("HttpService"):JSONDecode(Data)
+end
 
-		Discord = {
-			Enabled = true,
-			Invite = "https://discord.gg/Dm2B5QNgyX",
-			RememberJoins = true 
+Digest = function(Input)
+	local InputString = tostring(input)
+	local Hash = {}
+	local HashHex = ""
+
+	for i = 1, #InputString do
+		table.insert(Hash, string.byte(InputString, i))
+	end
+
+	for _, Byte in ipairs(Hash) do
+		HashHex = HashHex .. string.format("%02x", Byte)
+	end
+
+	return HashHex
+end
+
+Module.CacheLink = function()
+	if CachedTime + (10 * 60) < os.time() then
+		local Response = GetRequest({
+			Url = Host .. "/public/start",
+			Method = "POST",
+
+			Body = Encode({
+				service = Service,
+				identifier = Digest(GetHWID())
+			}),
+
+			Headers = {
+				["Content-Type"] = "application/json"
+			}
+		})
+
+		if Response.StatusCode == 200 then
+			local Decoded = Decode(Response.Body)
+
+			if Decoded.success == true then
+				CachedLink = Decoded.data.url
+				CachedTime = os.time()
+				return true, CachedLink
+			else
+				return false, Decoded.message
+			end
+		elseif Response.StatusCode == 429 then
+			local Message = "you are being rate limited, please wait 20 seconds and try again."
+
+			Notify("Slow Down!", Message)
+			return false, Message
+		end
+	else
+		return true, CachedLink
+	end
+end
+
+Module.CopyLink = function()
+	local Success, Link = Module.CacheLink()
+
+	if Success then
+		SetClipboard(Link)
+		Notify("Success", "Set the key url to your clipboard, paste it into your browser to get the key.", 6.5)
+	else
+		Notify("Error", "Error getting the key link. Report this in the discord server.", 6.5)
+	end
+end
+
+Module.RedeemKey = function(Key)
+	local nonce = GenerateNonce()
+	local Endpoint = Host .. "/public/redeem/" .. tostring(Service)
+
+	local body = {
+		identifier = Digest(GetHWID()),
+		key = Key
+	}
+
+	if useNonce then
+		body.nonce = nonce
+	end
+
+	local Response = GetRequest({
+		Url = Endpoint,
+		Method = "POST",
+		Body = Encode(body),
+		Headers = {
+			["Content-Type"] = "application/json"
 		}
 	})
 
-	local KeyTab = Window:CreateTab("Key")
-	
-	KeyTab:CreateInput({
-		Name = "Key Input",
-		CurrentValue = "",
-		PlaceholderText = "Enter Your Key",
-		RemoveTextAfterFocusLost = false,
-		Flag = "VadeKey",
-		
-		Callback = function(Text)
-			--Add Logic
-		end,
-	})
+	if Response.StatusCode == 200 then
+		local Decoded = Decode(Response.Body)
 
-	KeyTab:CreateButton({
-		Name = "Get Key",
-	})
+		if Decoded.success == true then
+			if Decoded.data.valid == true then
+				if useNonce then
+					if Decoded.data.hash == Digest("true" .. "-" .. nonce .. "-" .. Secret) then
+						return true
+					else
+						Notify("Failed", "Failed to verify integrity.")
+						return false
+					end    
+				else
+					return true
+				end
+			else
+				Notify("Invalid Key", "Your key is invalid.")
+				return false
+			end
+		else
+			if FunctionsLib.StringSub(Decoded.message, 1, 27) == "unique constraint violation" then
+				Notify("Heads Up!", "You already have an active key, please wait for it to expire before redeeming it.")
+				return false
+			else
+				Notify("???", Decoded.message)
+				return false
+			end
+		end
+	elseif Response.StatusCode == 429 then
+		Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+		return false
+	else
+		Notify("Error", "server returned an invalid status code, please try again later.")
+		return false
+	end
+end
+
+Module.VerifyKey = function(Key)
+	if RequestSending == true then
+		Notify("Slow Down!", "a request is already being sent, please slow down.")
+		return false
+	else
+		RequestSending = true
+	end
+
+	local nonce = GenerateNonce()
+	local Endpoint = Host .. "/public/whitelist/" .. tostring(Service) .. "?identifier=" .. Digest(FunctionsLib.GetHWID()) .. "&key=" .. Key
+
+	if UseNonce then
+		Endpoint = Endpoint .. "&nonce=" .. nonce
+	end
+
+	local Response = FunctionsLib.GetRequest({Url = Endpoint, Method = "GET"})
+
+	RequestSending = false
+
+	if Response.StatusCode == 200 then
+		local Decoded = Decode(Response.Body)
+
+		if Decoded.success == true then
+			if Decoded.data.valid == true then
+				if UseNonce then
+					return true
+				else
+					return true
+				end
+			else
+				if FunctionsLib.StringSub(Key, 1, 4) == "KEY_" then
+					return RedeemKey(Key)
+				else
+					Notify("Invalid Key", "Your key is invalid")
+					return false
+				end
+			end
+		else
+			Notify("???", Decoded.message)
+			return false
+		end
+	elseif response.StatusCode == 429 then
+		Notify("Slow Down!", "you are being rate limited, please wait 20 seconds and try again.")
+		return false
+	else
+		Notify("Error", "server returned an invalid status code, please try again later.")
+		return false
+	end
 end
 
 return Module

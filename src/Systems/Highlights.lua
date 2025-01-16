@@ -1,9 +1,8 @@
+local Module = {}
+
 --// Variables \\--
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = game.Players.LocalPlayer
 local Roles = nil
 local Murderer = nil
 local Sheriff = nil
@@ -11,15 +10,15 @@ local Hero = nil
 
 --// Functions \\--
 
-CreateHighlight = function()
-	for _, Player in pairs(Players:GetChildren()) do
+function Module:CreateHighlight()
+	for _, Player in pairs(game.Players:GetChildren()) do
 		if Player ~= LocalPlayer and Player.Character and not Player.Character:FindFirstChild("Highlight") then
 			Instance.new("Highlight", Player.Character)           
 		end
 	end
 end
 
-IsAlive = function(Player)
+function Module:IsAlive(Player)
 	for PlayerName, Data in pairs(Roles) do
 		if Player.Name == PlayerName then
 			if not Data.Killed and not Data.Dead then
@@ -31,7 +30,7 @@ IsAlive = function(Player)
 	end
 end
 
-UpdateHighlights = function()
+function Module:UpdateHighlights()
 	for _, Player in pairs(Players:GetChildren()) do
 		if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("Highlight") then
 			local Highlight = Player.Character:FindFirstChild("Highlight")
@@ -49,19 +48,23 @@ UpdateHighlights = function()
 	end
 end
 
-RunService.RenderStepped:connect(function()
-	Roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
-	
-	for PlayerName, Data in pairs(Roles) do
-		if Data.Role == "Murderer" then
-			Murderer = PlayerName
-		elseif Data.Role == 'Sheriff'then
-			Sheriff = PlayerName
-		elseif Data.Role == 'Hero'then
-			Hero = PlayerName
+function Module:Init()
+	game["Run Service"].RenderStepped:Connect(function()
+		Roles = game.ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+
+		for PlayerName, Data in pairs(Roles) do
+			if Data.Role == "Murderer" then
+				Murderer = PlayerName
+			elseif Data.Role == 'Sheriff'then
+				Sheriff = PlayerName
+			elseif Data.Role == 'Hero'then
+				Hero = PlayerName
+			end
 		end
-	end
-	
-	CreateHighlight()
-	UpdateHighlights()
-end)
+
+		Module:CreateHighlight()
+		Module:UpdateHighlights()
+	end)
+end
+
+return Module

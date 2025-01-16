@@ -6,7 +6,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 --// Main \\--
 
-function Module:Notify(TitleText, ContentText, Duration, Image)
+function Module.Notify(TitleText, ContentText, Duration, Image)
 	Rayfield:Notify({
 		Title = TitleText or "",
 		Content = ContentText or "",

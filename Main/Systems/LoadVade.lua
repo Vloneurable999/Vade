@@ -6,7 +6,7 @@ local Directory = _G.Vade.Directory
 
 --// Main \\--
 
-function Module.LoadVade()
+function Module.Init()
 	local CurrentKey = readfile(FolderName .."//Key.txt")
 	local VerifyCheck = VerifyKey(CurrentKey)
 	
@@ -15,6 +15,9 @@ function Module.LoadVade()
 			Directory.KeyWindow.Init()
 		else
 			Directory.MainWindow.Init()
+		end
+	else
+		Directory.KeyWindow.Init()
 	end
 end
 

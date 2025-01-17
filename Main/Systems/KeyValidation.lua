@@ -2,7 +2,7 @@ local Module = {}
 
 --// Variables \\--
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = _G.Vade.Directory.Rayfield
 local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vloneurable999/Vade/refs/heads/main/Main/Systems/Notify.lua"))()
 local CachedLink = ""
 local CachedTime = 0

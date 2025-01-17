@@ -35,11 +35,11 @@ function Module:UpdateHighlights()
 		if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("Highlight") then
 			local Highlight = Player.Character:FindFirstChild("Highlight")
 			
-			if Player.Name == Sheriff and IsAlive(Player) then
+			if Player.Name == Sheriff and Module:IsAlive(Player) then
 				Highlight.FillColor = Color3.fromRGB(0, 0, 225)
-			elseif Player.Name == Murderer and IsAlive(Player) then
+			elseif Player.Name == Murderer and Module:IsAlive(Player) then
 				Highlight.FillColor = Color3.fromRGB(225, 0, 0)
-			elseif Player.Name == Hero and IsAlive(Player) and not IsAlive(game.Players[Sheriff]) then
+			elseif Player.Name == Hero and Module:IsAlive(Player) and not Module:IsAlive(game.Players[Sheriff]) then
 				Highlight.FillColor = Color3.fromRGB(255, 250, 0)
 			else
 				Highlight.FillColor = Color3.fromRGB(0, 225, 0)

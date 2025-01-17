@@ -45,6 +45,7 @@ function Module.Init()
 			
 			if Verify then
 				Rayfield:Destroy()
+				task.wait(0.5)
 				MainWindow.Init()
 			end 
 		end,

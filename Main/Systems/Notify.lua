@@ -2,7 +2,7 @@ local Module = {}
 
 --// Variables \\--
 
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Rayfield = _G.Vade.Directory.Rayfield
 
 --// Main \\--
 

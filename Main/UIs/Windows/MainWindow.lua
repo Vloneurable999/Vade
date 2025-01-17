@@ -2,7 +2,7 @@ local Module = {}
 
 --// Variables \\--
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = _G.Vade.Directory.Rayfield
 
 --// Main \\--
 
@@ -33,6 +33,9 @@ function Module.Init()
 
 	MainTab:CreateButton({
 		Name = "Test",
+		Callback = function()
+
+		end,
 	})
 	
 	local Slider = MainTab:CreateSlider({

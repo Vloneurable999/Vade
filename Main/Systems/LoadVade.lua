@@ -8,7 +8,7 @@ local Directory = _G.Vade.Directory
 
 function Module.Init()
 	local CurrentKey = readfile(FolderName .."//Key.txt")
-	local VerifyCheck = VerifyKey(CurrentKey)
+	local VerifyCheck = Directory.KeyValidation.VerifyKey(CurrentKey)
 	
 	if CurrentKey ~= "nil" then
 		if VerifyCheck == false then
